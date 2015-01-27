@@ -23,3 +23,10 @@ From terminal B:
 ```sh
 sbt fastOptStage::run
 ```
+
+## List available MBeans from Scala REPL
+
+```sh
+scala
+:load list-mbeans.scala
+```
