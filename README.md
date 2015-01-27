@@ -1,8 +1,9 @@
 jtop
 =============
-An htop-style terminal app for JMX enabled Java apps
 
-Setup on OS X
+An htop-style terminal app for JMX enabled JVM apps.
+
+Setup on OS X:
 
 ```sh
 brew install node npm
