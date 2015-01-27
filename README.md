@@ -1,14 +1,24 @@
-# jtop
+jtop
+=============
 An htop-style terminal app for JMX enabled Java apps
 
-- brew install node
-- brew install npm
-- npm install jmx
+Setup on OS X
 
-# Running jtop
+```sh
+brew install node npm
+npm install jmx blessed
+```
+
+## Running jtop
 
 From terminal A:
-- sbt ~fastOptJS
+
+```sh
+sbt ~fastOptJS
+```
 
 From terminal B:
-- sbt fastOptStage::run
+
+```sh
+sbt fastOptStage::run
+```
