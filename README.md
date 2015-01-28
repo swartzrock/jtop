@@ -6,7 +6,7 @@ An htop-style terminal app for JMX enabled JVM apps.
 Setup on OS X:
 
 ```sh
-brew install node npm
+brew install node 
 npm install jmx blessed blessed-contrib
 ```
 
