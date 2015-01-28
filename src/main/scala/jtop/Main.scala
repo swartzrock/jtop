@@ -32,13 +32,38 @@ object Main extends scala.scalajs.js.JSApp {
       println(s"TotalLoadedClassCount: $count")
     })
 
-    client.getAttribute("java.lang:type=MemoryPool,name=PS Eden Space", "Type", (data: Dynamic) => {
-      println(data)
-    })
+    // HEAP
 
     client.getAttribute("java.lang:type=MemoryPool,name=PS Eden Space", "Usage", (data: Dynamic) => {
       val used = data.getSync("used")
       println(s"PS Eden Space used: $used")
+    })
+
+    client.getAttribute("java.lang:type=MemoryPool,name=PS Survivor Space", "Usage", (data: Dynamic) => {
+      val used = data.getSync("used")
+      println(s"PS Survivor Space used: $used")
+    })
+
+    client.getAttribute("java.lang:type=MemoryPool,name=PS Old Gen", "Usage", (data: Dynamic) => {
+      val used = data.getSync("used")
+      println(s"PS Old Gen used: $used")
+    })
+
+    // NON_HEAP
+
+    client.getAttribute("java.lang:type=MemoryPool,name=Code Cache", "Usage", (data: Dynamic) => {
+      val used = data.getSync("used")
+      println(s"Code Cache used: $used")
+    })
+
+    client.getAttribute("java.lang:type=MemoryPool,name=Compressed Class Space", "Usage", (data: Dynamic) => {
+      val used = data.getSync("used")
+      println(s"Compressed Class Space used: $used")
+    })
+
+    client.getAttribute("java.lang:type=MemoryPool,name=Metaspace", "Usage", (data: Dynamic) => {
+      val used = data.getSync("used")
+      println(s"Metaspace used: $used")
     })
   }
 
