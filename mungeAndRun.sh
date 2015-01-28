@@ -2,6 +2,8 @@
 
 cd $(cd -P -- "$( dirname -- "${BASH_SOURCE[0]}")" && pwd -P)
 
+sbt fastOptJS
+
 cp -p target/scala-2.11/jtop-fastopt.js jtop.js
 
 cat target/scala-2.11/jtop-fastopt.js | sed 's/ScalaJS.g\["require"\]/require/' > jtop.js
