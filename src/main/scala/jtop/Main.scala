@@ -73,7 +73,8 @@ object Main extends scala.scalajs.js.JSApp {
 
 
 
-  var heapUsagePercentData: Array[Double] = Array(1.0, 2.0, 3.0, 4.0, 5.0, 6.0)
+  var heapUsagePercentData: Array[Double] = Array(40.0, 45.0, 51.0, 62.0, 90.0, 63.0)
+  var loadedClassesData: Array[Double] = Array(200.0, 900.0, 2403.0, 9912.0, 12100.0)
 
 
   def renderScreen(): Unit = {
@@ -85,17 +86,21 @@ object Main extends scala.scalajs.js.JSApp {
 
     val screen = blessed.screen()
 
-    val mainGrid = js.Dynamic.newInstance(contrib.grid)(js.Dynamic.literal(rows = 1, cols = 1))
-
-    // screen.key(List("escape", "q", "C-c"), (ch: Any, key: Any) => System.exit(0))
+    val mainGrid = js.Dynamic.newInstance(contrib.grid)(js.Dynamic.literal(rows = 2, cols = 1))
 
     mainGrid.set(0, 0, contrib.line,
       js.Dynamic.literal(maxY = 100, showNthLabel = 9999, label = "Heap Memory Usage")
     )
+    mainGrid.set(1, 0, contrib.line,
+      js.Dynamic.literal(maxY = 100, showNthLabel = 9999, label = "Loaded Classes")
+    )
     mainGrid.applyLayout(screen)
 
     val heapUsageLine = mainGrid.get(0, 0)
-    heapUsageLine.setData(Array[String](" "), Array[Double](1.0, 2.0, 3.0))
+    val loadedClassesLine = mainGrid.get(1, 0)
+
+    heapUsageLine.setData(Array[String](" "), heapUsagePercentData)
+    loadedClassesLine.setData(Array[String](" "), loadedClassesData)
 
     screen.render()
 
