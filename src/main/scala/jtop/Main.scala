@@ -78,7 +78,7 @@ object Main extends scala.scalajs.js.JSApp {
   var threadsData: Array[Double] = Array(20.0, 21.0, 28.0, 28.0, 25.0, 32.0, 31.0, 35.0)
 
   var heapUsageBarsData: Array[Double] = Array(20.0, 15.0, 40.0)
-  var offheapUsageBarsData: Array[Double] = Array(34.0, 22.0, 4.0)
+  var offheapUsageBarsData: Array[Double] = Array(34.0, 22.0, 14.0)
 
 
   def renderScreen(): Unit = {
@@ -138,7 +138,7 @@ object Main extends scala.scalajs.js.JSApp {
     threadsLine.setData(Array[String](" "), threadsData)
 
     heapUsageBars.setData(js.Dynamic.literal(titles = Array[String]("OldGen", "Eden", "Survivor"), data = heapUsageBarsData))
-    offHeapUsageBars.setData(js.Dynamic.literal(titles = Array[String]("OldGen", "Eden", "Survivor"), data = offheapUsageBarsData))
+    offHeapUsageBars.setData(js.Dynamic.literal(titles = Array[String]("Meta", "Cache", "Compr"), data = offheapUsageBarsData))
 
     screen.render()
 
