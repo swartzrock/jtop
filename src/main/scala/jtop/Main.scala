@@ -7,6 +7,8 @@ object Main extends scala.scalajs.js.JSApp {
   import js.Dynamic
   import js.Dynamic.global
 
+  val maxRetentionSize = 100
+
   var screen: js.Dynamic = null
   var heapUsageLine: js.Dynamic = null
   var loadedClassesLine: js.Dynamic = null
@@ -85,15 +87,15 @@ object Main extends scala.scalajs.js.JSApp {
   def refreshData(client: Client): Unit = {
     client.getAttribute("java.lang:type=Memory", "HeapMemoryUsage", (data: Dynamic) => {
       val used = data.getSync("used").toString.toDouble / 1048576.0
-      heapUsagePercentData = heapUsagePercentData :+ used
+      heapUsagePercentData = (heapUsagePercentData :+ used).takeRight(maxRetentionSize)
     })
 
     client.getAttribute("java.lang:type=Threading", "ThreadCount", (count: Dynamic) => {
-      threadsData = threadsData :+ count.toString.toDouble
+      threadsData = (threadsData :+ count.toString.toDouble).takeRight(maxRetentionSize)
     })
 
     client.getAttribute("java.lang:type=ClassLoading", "TotalLoadedClassCount", (count: Dynamic) => {
-      loadedClassesData = loadedClassesData :+ count.toString.toDouble
+      loadedClassesData = (loadedClassesData :+ count.toString.toDouble).takeRight(maxRetentionSize)
     })
 
     def percentFor(data: Dynamic): Double = {
