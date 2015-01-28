@@ -1,4 +1,4 @@
-package htop
+package jtop
 
 case class Client(host: String, port: Int)
 

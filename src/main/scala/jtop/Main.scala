@@ -1,4 +1,4 @@
-package htop
+package jtop
 
 object Main extends scala.scalajs.js.JSApp {
   import scala.scalajs.js

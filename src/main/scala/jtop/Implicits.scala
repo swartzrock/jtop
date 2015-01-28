@@ -1,4 +1,4 @@
-package htop
+package jtop
 
 object Implicits {
   implicit class Pickler[T](val expr: T) extends AnyVal {
