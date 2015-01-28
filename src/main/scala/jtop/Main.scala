@@ -46,7 +46,7 @@ object Main extends scala.scalajs.js.JSApp {
     val gridLeft = js.Dynamic.newInstance(contrib.grid)(js.Dynamic.literal(rows = 2, cols = 1))
 
     gridLeft.set(0, 0, contrib.line,
-      js.Dynamic.literal(maxY = 100, showNthLabel = 9999, label = "Heap Memory Usage",
+      js.Dynamic.literal(showNthLabel = 9999, label = "Heap Memory Usage (Mb)",
         style = js.Dynamic.literal(line = "blue", text = "white"))
     )
     gridLeft.set(1, 0, contrib.line,
@@ -64,7 +64,7 @@ object Main extends scala.scalajs.js.JSApp {
 
     val gridRight = js.Dynamic.newInstance(contrib.grid)(js.Dynamic.literal(rows = 2, cols = 1))
     gridRight.set(0, 0, contrib.line,
-      js.Dynamic.literal(maxY = 100, showNthLabel = 9999, label = "Threads",
+      js.Dynamic.literal(showNthLabel = 9999, label = "Threads",
         style = js.Dynamic.literal(line = "red", text = "white"))
     )
     gridRight.set(1, 0, gridBottomRight)
@@ -84,7 +84,7 @@ object Main extends scala.scalajs.js.JSApp {
 
   def refreshData(client: Client): Unit = {
     client.getAttribute("java.lang:type=Memory", "HeapMemoryUsage", (data: Dynamic) => {
-      val used = data.getSync("used").toString.toDouble
+      val used = data.getSync("used").toString.toDouble / 1048576.0
       heapUsagePercentData = heapUsagePercentData :+ used
     })
 
