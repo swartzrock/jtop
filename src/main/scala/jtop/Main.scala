@@ -15,7 +15,10 @@ object Main extends scala.scalajs.js.JSApp {
     client.connect()
     client.on("connect", () => {
       refresh(client)
+      renderScreen()
     })
+
+
   }
 
   def refresh(client: Client): Unit = {
@@ -65,6 +68,37 @@ object Main extends scala.scalajs.js.JSApp {
       val used = data.getSync("used")
       println(s"Metaspace used: $used")
     })
+  }
+
+
+
+
+  var heapUsagePercentData: Array[Double] = Array(1.0, 2.0, 3.0, 4.0, 5.0, 6.0)
+
+
+  def renderScreen(): Unit = {
+
+    val blessed = global.require("blessed")
+    val contrib = global.require("blessed-contrib")
+
+    println(s"Creating widgets")
+
+    val screen = blessed.screen()
+
+    val mainGrid = js.Dynamic.newInstance(contrib.grid)(js.Dynamic.literal(rows = 1, cols = 1))
+
+    // screen.key(List("escape", "q", "C-c"), (ch: Any, key: Any) => System.exit(0))
+
+    mainGrid.set(0, 0, contrib.line,
+      js.Dynamic.literal(maxY = 100, showNthLabel = 9999, label = "Heap Memory Usage")
+    )
+    mainGrid.applyLayout(screen)
+
+    val heapUsageLine = mainGrid.get(0, 0)
+    heapUsageLine.setData(Array[String](" "), Array[Double](1.0, 2.0, 3.0))
+
+    screen.render()
+
   }
 
 }
