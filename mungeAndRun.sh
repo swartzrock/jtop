@@ -4,19 +4,9 @@ cd $(cd -P -- "$( dirname -- "${BASH_SOURCE[0]}")" && pwd -P)
 
 cp -p target/scala-2.11/jtop-fastopt.js jtop.js
 
+cat target/scala-2.11/jtop-fastopt.js | sed 's/ScalaJS.g\["require"\]/require/' > jtop.js
+
 cat << EOF >> jtop.js
-var jmx = require('jmx');
-require('blessed');
-require('blessed-contrib');
-
-ScalaJS.g["require"] = function(v) {
-  if (v === "jmx") return jmx;
-};
-
-//ScalaJS.g["require"]["jmx"] = require('jmx');
-//ScalaJS.g["require"]["blessed"] = require('blessed');
-//ScalaJS.g["require"]["blessed_contrib"] = require('blessed-contrib');
-
 // Hack console log to duplicate double % signs
 (function() {
   var oldLog = console.log;
@@ -33,3 +23,5 @@ ScalaJS.g["require"] = function(v) {
 ((typeof global === "object" && global &&
   global["Object"] === Object) ? global : this)["jtop"]["Main"]().main();
 EOF
+
+node jtop.js
