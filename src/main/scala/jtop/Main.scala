@@ -1,17 +1,15 @@
 package jtop
 
+import jtop.jmx.{JMX, ClientConfiguration}
+
 object Main extends scala.scalajs.js.JSApp {
   import scala.scalajs.js
   import js.Dynamic
   import js.Dynamic.global
-  import Implicits._
 
   def main(): Unit = {
-    val jmx = global.require("jmx")
-
     println("Creating client")
-
-    val client = jmx.createClient(Client(host = "localhost", port = 8855))
+    val client = JMX.createClient(ClientConfiguration(host = "localhost", port = 8855))
 
     println("Connecting...")
     client.connect()
@@ -24,13 +22,6 @@ object Main extends scala.scalajs.js.JSApp {
         println(s"HeapMemoryUsage used: $used")
       })
 
-      client.setAttribute("java.lang:type=Memory", "Verbose", true, () => {
-        println("Memory verbose on") // callback is optional
-      })
-
-      client.invoke("java.lang:type=Memory", "gc", js.Array(), (data: Dynamic) => {
-        println("gc() done")
-      })
     })
 
   }
