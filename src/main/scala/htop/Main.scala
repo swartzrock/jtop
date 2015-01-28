@@ -15,41 +15,23 @@ object Main extends scala.scalajs.js.JSApp {
 
     println("Connecting...")
     client.connect()
+    client.on("connect", () => {
+      println("Requesting heap memory usage...")
 
-    println("Requesting heap memory usage...")
-    client.getAttribute("java.lang:type=Memory", "HeapMemoryUsage", (data: Dynamic) => {
-      println("Data returned.")
-      val used = data.getSync("used")
-      println(s"HeapMemoryUsage used: $used")
+      client.getAttribute("java.lang:type=Memory", "HeapMemoryUsage", (data: Dynamic) => {
+        println("Data returned.")
+        val used = data.getSync("used")
+        println(s"HeapMemoryUsage used: $used")
+      })
+
+      client.setAttribute("java.lang:type=Memory", "Verbose", true, () => {
+        println("Memory verbose on") // callback is optional
+      })
+
+      client.invoke("java.lang:type=Memory", "gc", js.Array(), (data: Dynamic) => {
+        println("gc() done")
+      })
     })
 
-    /*
-client = jmx.createClient({
-  host: "localhost", // optional
-  port: 3000
-});
-
-client.connect();
-client.on("connect", function() {
-
-  client.getAttribute("java.lang:type=Memory", "HeapMemoryUsage", function(data) {
-    var used = data.getSync('used');
-    console.log("HeapMemoryUsage used: " + used.longValue);
-    // console.log(data.toString());
-  });
-
-  client.setAttribute("java.lang:type=Memory", "Verbose", true, function() {
-    console.log("Memory verbose on"); // callback is optional
-  });
-
-  client.invoke("java.lang:type=Memory", "gc", [], function(data) {
-    console.log("gc() done");
-  });
-
-});
-client = jmx.createClient({
-  service: "service:jmx:rmi:///jndi/rmi://localhost:3000/jmxrmi"
-});
-    * */
   }
 }
