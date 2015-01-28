@@ -1,51 +1,30 @@
 jtop
 =============
 
-An htop-style terminal app for JMX enabled JVM apps.
+A terminal application that monitors Java applications over JMX. Uses NCURSES to graphically monitor activity.
+
+Written in Scala.js for Node.js.
 
 ![screenshot](screenshot.png)
 
 
-Setup on OS X:
+## Requirements
 
-```sh
-brew install node
-npm install jmx blessed blessed-contrib
-```
+jtop requires Node.js and certain modules.
+
+Here are the command to install Node (requires Homebrew) and the necessary modules.
+
+    brew install node
+    npm install jmx blessed blessed-contrib
+
+You will also need a terminal supporting full xterm colors.
 
 ## Running jtop
 
-From terminal A:
+To start, you'll need a Java application to monitor. Run the following commands in the terminal to enable JMX monitoring and then start a Scala REPL that will be busy sorting strings.
 
-```sh
-sbt ~fastOptJS
-```
+    export JAVA_OPTS="-Dcom.sun.management.jmxremote.port=8855 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false"
+    scala -e 'for (i <- 1 to 100) { println("processing"); val l = (1 to 100000).map(_.toString).toList;  util.Random.shuffle(l).sorted; Thread.sleep(1000); }'
 
-From terminal B:
+Then, in a separate (and colorful!) terminal execute `run.sh`.
 
-```sh
-sbt fastOptStage::run
-```
-
-## Launch test java application (Scala REPL)
-
-Note - this is the Java process serving JMX information.
-
-```sh
-export JAVA_OPTS="-Dcom.sun.management.jmxremote.port=8855 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false" scala
-scala
-```
-
-## List available MBeans from Scala REPL
-
-```sh
-scala
-:load list-mbeans.sc
-```
-
-## Launch UI
-
-```sh
-cd <project root>
-./mungeAndRun.sh
-```
