@@ -21,10 +21,11 @@ You will also need a terminal supporting full xterm colors.
 
 ## Running jtop
 
-To start, you'll need a Java application to monitor. Run the following commands in the terminal to enable JMX monitoring and then start a Scala REPL that will be busy sorting strings.
+To start, you'll need a Java application to monitor. Run the following commands in the terminal to enable JMX monitoring and then start a Scala REPL that will be busy sorting strings and juggling threads.
 
     export JAVA_OPTS="-Dcom.sun.management.jmxremote.port=8855 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false"
-    scala -e 'for (i <- 1 to 1000) { println("processing"); val l = (1 to 100000).map(_.toString).toList;  util.Random.shuffle(l).sorted; Thread.sleep(2000); }'
+
+    scala -e 'import scala.concurrent.ExecutionContext.Implicits.global; import scala.concurrent.Future; while(true) { Future { for (i <- 1 to util.Random.nextInt(20)) { println("processing"); val l = (1 to 100000).map(_.toString).toList;  util.Random.shuffle(l).sorted; Thread.sleep(util.Random.nextInt(2000)); }; }; Thread.sleep(util.Random.nextInt(4000)) }'
 
 Then, in a separate (and colorful!) terminal execute `run.sh`.
 

@@ -22,10 +22,18 @@ object Main extends scala.scalajs.js.JSApp {
   val heapUsageBarsData = Array[Double](0.0, 0.0, 0.0)
   val offheapUsageBarsData = Array[Double](0.0, 0.0, 0.0)
 
+  val host = "localhost"
+  val port = 8855 // NOTE: this would be better as a command-line argument
+  val refreshInterval = 300
+
+
+  /**
+   * The entry point of our jtop application.
+   */
   def main(): Unit = {
     initScreen()
 
-    val client = JMX.createClient(ClientConfiguration(host = "localhost", port = 8855))
+    val client = JMX.createClient(ClientConfiguration(host = host, port = port))
     client.connect()
     client.on("connect", () => {
       refreshData(client)
@@ -34,7 +42,7 @@ object Main extends scala.scalajs.js.JSApp {
       global.setInterval(() => {
         refreshData(client)
         renderScreen()
-      }, 300)
+      }, refreshInterval)
     })
   }
 
@@ -84,6 +92,10 @@ object Main extends scala.scalajs.js.JSApp {
     offHeapUsageBars = gridBottomRight.get(0, 1)
   }
 
+
+  /**
+   * Collect new data from JMX
+   */
   def refreshData(client: Client): Unit = {
     client.getAttribute("java.lang:type=Memory", "HeapMemoryUsage", (data: Dynamic) => {
       val used = data.getSync("used").toString.toDouble / 1048576.0
@@ -128,14 +140,16 @@ object Main extends scala.scalajs.js.JSApp {
     })
 
     client.getAttribute("java.lang:type=MemoryPool,name=Metaspace", "Usage", (data: Dynamic) => {
-      //HAAAAAAAAACK
-      // :-(
       val used = data.getSync("committed").toString.toDouble
       val max = used * 5
       offheapUsageBarsData(0) = math.abs(math.ceil((used / max) * 100.0D))
     })
   }
 
+
+  /**
+   * Update the data on the screen and render it again
+   */
   def renderScreen(): Unit = {
     heapUsageLine.setData(Array[String](" "), heapUsagePercentData)
     loadedClassesLine.setData(Array[String](" "), loadedClassesData)
