@@ -96,38 +96,41 @@ object Main extends scala.scalajs.js.JSApp {
       loadedClassesData = loadedClassesData :+ count.toString.toDouble
     })
 
+    def percentFor(data: Dynamic): Double = {
+      val used = data.getSync("used").toString.toDouble
+      val max = data.getSync("max").toString.toDouble
+      math.abs(math.ceil((used / max) * 100.0D))
+    }
     // HEAP
 
     client.getAttribute("java.lang:type=MemoryPool,name=PS Eden Space", "Usage", (data: Dynamic) => {
-      val used = data.getSync("used")
-      // println(s"PS Eden Space used: $used")
+      heapUsageBarsData(1) = percentFor(data)
     })
 
     client.getAttribute("java.lang:type=MemoryPool,name=PS Survivor Space", "Usage", (data: Dynamic) => {
-      val used = data.getSync("used")
-      // println(s"PS Survivor Space used: $used")
+      heapUsageBarsData(2) = percentFor(data)
     })
 
     client.getAttribute("java.lang:type=MemoryPool,name=PS Old Gen", "Usage", (data: Dynamic) => {
-      val used = data.getSync("used")
-      // println(s"PS Old Gen used: $used")
+      heapUsageBarsData(0) = percentFor(data)
     })
 
     // NON_HEAP
 
     client.getAttribute("java.lang:type=MemoryPool,name=Code Cache", "Usage", (data: Dynamic) => {
-      val used = data.getSync("used")
-      // println(s"Code Cache used: $used")
+      offheapUsageBarsData(1) = percentFor(data)
     })
 
     client.getAttribute("java.lang:type=MemoryPool,name=Compressed Class Space", "Usage", (data: Dynamic) => {
-      val used = data.getSync("used")
-      // println(s"Compressed Class Space used: $used")
+      offheapUsageBarsData(2) = percentFor(data)
     })
 
     client.getAttribute("java.lang:type=MemoryPool,name=Metaspace", "Usage", (data: Dynamic) => {
-      val used = data.getSync("used")
-      // println(s"Metaspace used: $used")
+      //HAAAAAAAAACK
+      // :-(
+      val used = data.getSync("committed").toString.toDouble
+      val max = used * 5
+      offheapUsageBarsData(0) = math.abs(math.ceil((used / max) * 100.0D))
     })
   }
 
