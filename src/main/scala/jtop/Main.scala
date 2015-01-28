@@ -7,32 +7,91 @@ object Main extends scala.scalajs.js.JSApp {
   import js.Dynamic
   import js.Dynamic.global
 
-  def main(): Unit = {
-    // println("Creating client")
-    val client = JMX.createClient(ClientConfiguration(host = "localhost", port = 8855))
+  var screen: js.Dynamic = null
+  var heapUsageLine: js.Dynamic = null
+  var loadedClassesLine: js.Dynamic = null
+  var threadsLine: js.Dynamic = null
+  var heapUsageBars: js.Dynamic = null
+  var offHeapUsageBars: js.Dynamic = null
 
-    // println("Connecting...")
+  var heapUsagePercentData = Array[Double](0.0)
+  var loadedClassesData = Array[Double](0.0)
+  var threadsData = Array[Double](0.0)
+  val heapUsageBarsData = Array[Double](0.0, 0.0, 0.0)
+  val offheapUsageBarsData = Array[Double](0.0, 0.0, 0.0)
+
+  def main(): Unit = {
+    initScreen()
+
+    val client = JMX.createClient(ClientConfiguration(host = "localhost", port = 8855))
     client.connect()
     client.on("connect", () => {
-      refresh(client)
+      refreshData(client)
       renderScreen()
+
+      global.setInterval(() => {
+        refreshData(client)
+        renderScreen()
+      }, 300)
     })
-
-
   }
 
-  def refresh(client: Client): Unit = {
+  def initScreen() = {
+    val blessed = global.require("blessed")
+    val contrib = global.require("blessed-contrib")
+
+    screen = blessed.screen()
+
+    val mainGrid = js.Dynamic.newInstance(contrib.grid)(js.Dynamic.literal(rows = 1, cols = 2))
+
+    val gridLeft = js.Dynamic.newInstance(contrib.grid)(js.Dynamic.literal(rows = 2, cols = 1))
+
+    gridLeft.set(0, 0, contrib.line,
+      js.Dynamic.literal(maxY = 100, showNthLabel = 9999, label = "Heap Memory Usage")
+    )
+    gridLeft.set(1, 0, contrib.line,
+      js.Dynamic.literal(maxY = 10000, showNthLabel = 9999, label = "Loaded Classes")
+    )
+
+    val gridBottomRight = js.Dynamic.newInstance(contrib.grid)(js.Dynamic.literal(rows = 1, cols = 2))
+    gridBottomRight.set(0, 0, contrib.bar,
+      js.Dynamic.literal(barWidth = 5, barSpacing = 10, maxHeight = 10, label = "Heap Usage (%)")
+    )
+    gridBottomRight.set(0, 1, contrib.bar,
+      js.Dynamic.literal(barWidth = 5, barSpacing = 10, maxHeight = 10, label = "Off-Heap Usage (%)")
+    )
+
+    val gridRight = js.Dynamic.newInstance(contrib.grid)(js.Dynamic.literal(rows = 2, cols = 1))
+    gridRight.set(0, 0, contrib.line,
+      js.Dynamic.literal(maxY = 100, showNthLabel = 9999, label = "Threads")
+    )
+    gridRight.set(1, 0, gridBottomRight)
+
+    mainGrid.set(0, 0, gridLeft)
+    mainGrid.set(0, 1, gridRight)
+
+    mainGrid.applyLayout(screen)
+
+    heapUsageLine = gridLeft.get(0, 0)
+    loadedClassesLine = gridLeft.get(1, 0)
+
+    threadsLine = gridRight.get(0, 0)
+    heapUsageBars = gridBottomRight.get(0, 0)
+    offHeapUsageBars = gridBottomRight.get(0, 1)
+  }
+
+  def refreshData(client: Client): Unit = {
     client.getAttribute("java.lang:type=Memory", "HeapMemoryUsage", (data: Dynamic) => {
-      val used = data.getSync("used")
-      // println(s"HeapMemoryUsage used: $used")
+      val used = data.getSync("used").toString.toDouble
+      heapUsagePercentData = heapUsagePercentData :+ used
     })
 
     client.getAttribute("java.lang:type=Threading", "ThreadCount", (count: Dynamic) => {
-      // println(s"ThreadCount: $count")
+      threadsData = threadsData :+ count.toString.toDouble
     })
 
     client.getAttribute("java.lang:type=ClassLoading", "TotalLoadedClassCount", (count: Dynamic) => {
-      // println(s"TotalLoadedClassCount: $count")
+      loadedClassesData = loadedClassesData :+ count.toString.toDouble
     })
 
     // HEAP
@@ -70,69 +129,7 @@ object Main extends scala.scalajs.js.JSApp {
     })
   }
 
-
-
-
-  var heapUsagePercentData: Array[Double] = Array(40.0, 45.0, 51.0, 62.0, 90.0, 63.0)
-  var loadedClassesData: Array[Double] = Array(200.0, 900.0, 2403.0, 9912.0, 12100.0)
-  var threadsData: Array[Double] = Array(20.0, 21.0, 28.0, 28.0, 25.0, 32.0, 31.0, 35.0)
-
-  var heapUsageBarsData: Array[Double] = Array(20.0, 15.0, 40.0)
-  var offheapUsageBarsData: Array[Double] = Array(34.0, 22.0, 4.0)
-
-
   def renderScreen(): Unit = {
-
-    val blessed = global.require("blessed")
-    val contrib = global.require("blessed-contrib")
-
-    // println(s"Creating widgets")
-
-    val screen = blessed.screen()
-
-    val mainGrid = js.Dynamic.newInstance(contrib.grid)(js.Dynamic.literal(rows = 1, cols = 2))
-
-    val gridLeft = js.Dynamic.newInstance(contrib.grid)(js.Dynamic.literal(rows = 2, cols = 1))
-
-    gridLeft.set(0, 0, contrib.line,
-      js.Dynamic.literal(maxY = 100, showNthLabel = 9999, label = "Heap Memory Usage")
-    )
-    gridLeft.set(1, 0, contrib.line,
-      js.Dynamic.literal(maxY = 10000, showNthLabel = 9999, label = "Loaded Classes")
-    )
-
-
-    val gridBottomRight = js.Dynamic.newInstance(contrib.grid)(js.Dynamic.literal(rows = 1, cols = 2))
-    gridBottomRight.set(0, 0, contrib.bar,
-      js.Dynamic.literal(barWidth = 5, barSpacing = 10, maxHeight = 10, label = "Heap Usage (%)")
-    )
-    gridBottomRight.set(0, 1, contrib.bar,
-      js.Dynamic.literal(barWidth = 5, barSpacing = 10, maxHeight = 10, label = "Off-Heap Usage (%)")
-    )
-
-
-
-    val gridRight = js.Dynamic.newInstance(contrib.grid)(js.Dynamic.literal(rows = 2, cols = 1))
-    gridRight.set(0, 0, contrib.line,
-      js.Dynamic.literal(maxY = 100, showNthLabel = 9999, label = "Threads")
-    )
-    gridRight.set(1, 0, gridBottomRight)
-
-
-
-    mainGrid.set(0, 0, gridLeft)
-    mainGrid.set(0, 1, gridRight)
-
-    mainGrid.applyLayout(screen)
-
-    val heapUsageLine = gridLeft.get(0, 0)
-    val loadedClassesLine = gridLeft.get(1, 0)
-
-    val threadsLine = gridRight.get(0, 0)
-    val heapUsageBars = gridBottomRight.get(0, 0)
-    val offHeapUsageBars = gridBottomRight.get(0, 1)
-
-
     heapUsageLine.setData(Array[String](" "), heapUsagePercentData)
     loadedClassesLine.setData(Array[String](" "), loadedClassesData)
     threadsLine.setData(Array[String](" "), threadsData)
@@ -141,7 +138,6 @@ object Main extends scala.scalajs.js.JSApp {
     offHeapUsageBars.setData(js.Dynamic.literal(titles = Array[String]("OldGen", "Eden", "Survivor"), data = offheapUsageBarsData))
 
     screen.render()
-
   }
 
 }
