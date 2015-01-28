@@ -24,6 +24,12 @@ From terminal B:
 sbt fastOptStage::run
 ```
 
+## Launch test java application (Scala REPL)
+```sh
+export JAVA_OPTS="-Dcom.sun.management.jmxremote.port=8855 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false" scala
+scala
+```
+
 ## List available MBeans from Scala REPL
 
 ```sh

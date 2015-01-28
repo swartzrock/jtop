@@ -1,12 +1,28 @@
 package htop
 
-import scala.scalajs.js
-
 object Main extends scala.scalajs.js.JSApp {
+  import scala.scalajs.js
+  import js.Dynamic
+  import js.Dynamic.global
+  import Implicits._
+
   def main(): Unit = {
-    import js.Dynamic.global
-    val foo = global.require("jmx")
-    println("Hello World!")
+    val jmx = global.require("jmx")
+
+    println("Creating client")
+
+    val client = jmx.createClient(Client(host = "localhost", port = 8855))
+
+    println("Connecting...")
+    client.connect()
+
+    println("Requesting heap memory usage...")
+    client.getAttribute("java.lang:type=Memory", "HeapMemoryUsage", (data: Dynamic) => {
+      println("Data returned.")
+      val used = data.getSync("used")
+      println(s"HeapMemoryUsage used: $used")
+    })
+
     /*
 client = jmx.createClient({
   host: "localhost", // optional
