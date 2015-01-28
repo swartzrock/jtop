@@ -7,7 +7,7 @@ Setup on OS X:
 
 ```sh
 brew install node npm
-npm install jmx blessed
+npm install jmx blessed blessed-contrib
 ```
 
 ## Running jtop
