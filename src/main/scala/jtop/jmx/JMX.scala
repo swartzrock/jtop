@@ -7,6 +7,7 @@ object JMX {
 
   def createClient(options: ClientConfiguration): Client = {
     val jmx = global.require("jmx")
-    jmx.createClient(options).asInstanceOf[Client]
+
+    jmx.createClient(upickle.json.writeJs(upickle.writeJs(options)).asInstanceOf[js.Any]).asInstanceOf[Client]
   }
 }

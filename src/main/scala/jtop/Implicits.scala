@@ -1,8 +1,11 @@
 package jtop
 
+import scala.scalajs.js
+
 object Implicits {
-  implicit class Pickler[T](val expr: T) extends AnyVal {
-    def write(implicit writer: upickle.Writer[T]) =
-      upickle.write(expr)
-  }
+  import upickle._
+  import scala.language.implicitConversions
+
+  implicit def toJsAny[T : Writer](expr: T): js.Any =
+    json.writeJs(writeJs(expr)).asInstanceOf[js.Any]
 }
