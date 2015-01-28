@@ -37,3 +37,10 @@ scala
 scala
 :load list-mbeans.sc
 ```
+
+## Launch UI
+
+```sh
+cd <project root>
+./mungeAndRun.sh
+```
