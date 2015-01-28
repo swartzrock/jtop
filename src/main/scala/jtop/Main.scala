@@ -75,6 +75,10 @@ object Main extends scala.scalajs.js.JSApp {
 
   var heapUsagePercentData: Array[Double] = Array(40.0, 45.0, 51.0, 62.0, 90.0, 63.0)
   var loadedClassesData: Array[Double] = Array(200.0, 900.0, 2403.0, 9912.0, 12100.0)
+  var threadsData: Array[Double] = Array(20.0, 21.0, 28.0, 28.0, 25.0, 32.0, 31.0, 35.0)
+
+  var heapUsageBarsData: Array[Double] = Array(20.0, 15.0, 40.0)
+  var offheapUsageBarsData: Array[Double] = Array(34.0, 22.0, 4.0)
 
 
   def renderScreen(): Unit = {
@@ -86,24 +90,59 @@ object Main extends scala.scalajs.js.JSApp {
 
     val screen = blessed.screen()
 
-    val mainGrid = js.Dynamic.newInstance(contrib.grid)(js.Dynamic.literal(rows = 2, cols = 1))
+    val mainGrid = js.Dynamic.newInstance(contrib.grid)(js.Dynamic.literal(rows = 1, cols = 2))
 
-    mainGrid.set(0, 0, contrib.line,
+    val gridLeft = js.Dynamic.newInstance(contrib.grid)(js.Dynamic.literal(rows = 2, cols = 1))
+
+    gridLeft.set(0, 0, contrib.line,
       js.Dynamic.literal(maxY = 100, showNthLabel = 9999, label = "Heap Memory Usage")
     )
-    mainGrid.set(1, 0, contrib.line,
-      js.Dynamic.literal(maxY = 100, showNthLabel = 9999, label = "Loaded Classes")
+    gridLeft.set(1, 0, contrib.line,
+      js.Dynamic.literal(maxY = 10000, showNthLabel = 9999, label = "Loaded Classes")
     )
+
+
+    val gridBottomRight = js.Dynamic.newInstance(contrib.grid)(js.Dynamic.literal(rows = 1, cols = 2))
+    gridBottomRight.set(0, 0, contrib.bar,
+      js.Dynamic.literal(barWidth = 5, barSpacing = 10, maxHeight = 10, label = "Heap Usage (%)")
+    )
+    gridBottomRight.set(0, 1, contrib.bar,
+      js.Dynamic.literal(barWidth = 5, barSpacing = 10, maxHeight = 10, label = "Off-Heap Usage (%)")
+    )
+
+
+
+    val gridRight = js.Dynamic.newInstance(contrib.grid)(js.Dynamic.literal(rows = 2, cols = 1))
+    gridRight.set(0, 0, contrib.line,
+      js.Dynamic.literal(maxY = 100, showNthLabel = 9999, label = "Threads")
+    )
+    gridRight.set(1, 0, gridBottomRight)
+
+
+
+    mainGrid.set(0, 0, gridLeft)
+    mainGrid.set(0, 1, gridRight)
+
     mainGrid.applyLayout(screen)
 
-    val heapUsageLine = mainGrid.get(0, 0)
-    val loadedClassesLine = mainGrid.get(1, 0)
+    val heapUsageLine = gridLeft.get(0, 0)
+    val loadedClassesLine = gridLeft.get(1, 0)
+
+    val threadsLine = gridRight.get(0, 0)
+    val heapUsageBars = gridBottomRight.get(0, 0)
+    val offHeapUsageBars = gridBottomRight.get(0, 1)
+
 
     heapUsageLine.setData(Array[String](" "), heapUsagePercentData)
     loadedClassesLine.setData(Array[String](" "), loadedClassesData)
+    threadsLine.setData(Array[String](" "), threadsData)
+
+    heapUsageBars.setData(js.Dynamic.literal(titles = Array[String]("OldGen", "Eden", "Survivor"), data = heapUsageBarsData))
+    offHeapUsageBars.setData(js.Dynamic.literal(titles = Array[String]("OldGen", "Eden", "Survivor"), data = offheapUsageBarsData))
 
     screen.render()
 
   }
 
 }
+
