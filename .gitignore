@@ -3,6 +3,8 @@
 /.idea
 /node_modules
 
+/jtop.js
+
 target/
 .cache
 .classpath
